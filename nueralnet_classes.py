@@ -1,6 +1,7 @@
 # import modules
 import numpy as np
 import random as rand
+import copy as cp
 
 
 # define the class for each network
@@ -17,29 +18,35 @@ class nodeNet():
         self.fitness = 0;
         
         # inputs weights will be given by inputWeights[input][node]
-        self.inputWeights = [[1 for x in xrange(Nnodes)] for x in xrange(Ninputs+1)]  
+        self.inputWeights = np.ones((Ninputs+1, Nnodes))
 
         # output weights will be given by outputWeights[output][node]
-        self.outputWeights = [[1 for x in xrange(Nnodes)] for x in xrange(Noutputs)]  
+        self.outputWeights = np.ones((Noutputs, Nnodes))  
         
         
-    # process inputs will take in a list of length Ninputs and return a list of Noutputs     
-    def processInputs(self, inputs):
-        tempInputs = inputs
-        inputs.append(-1) # this last index is for the bias
-        node_arg = np.dot(inputs, self.inputWeights)
+    # process inputs will take in a 1D numpy vector of length Ninputs
+    # it returns a 1D numpy vector of Noutputs     
+    def processInputs(self, inputs):        
+        tempIn = np.append(inputs, -1) # this last index is for the bias
+        node_arg = np.dot(tempIn, self.inputWeights)
         node_values = 1/(1+np.exp(np.negative(node_arg))) # the activation function (a sigmoid)
         return np.dot(self.outputWeights, node_values)
         
     
-    # the input values will be MxNinputs array and the output values will be an MxNoutputs array
-    # this functions will process each input and return some metric of fitness, with lower being more fit
+    # the input values will be MxNinputs 2D numpy array     
+    # the output values will be an MxNoutputs 2D numpy array
+    # M = # of cases and N = # of outputs/case (i.e. Noutputs)      
+    # this functions processes each case and return a metric of fitness with lower being more fit
     # this metric could be sum((sum((err of outputs for a give input row)^2) for all rows)^2)
     def setFitness(self, inputs, trueOutputs):
-        Ncases = inputs.__len__()
+        if inputs.ndim == 1: # convert to array incase user is dufus
+            inArr = np.array([inputs])
+        else:
+            inArr = inputs
+        Ncases = inArr.shape[0]
         self.fitness = 0;
         for i in xrange(Ncases):
-            diffs = np.subtract(trueOutputs[i], self.processInputs(inputs[i]))
+            diffs = np.subtract(trueOutputs[i], self.processInputs(inArr[i]))
             contribution = np.sum(np.square(diffs))
             self.fitness = self.fitness + contribution
         
@@ -68,7 +75,7 @@ class geneticEvolution():
     # the new list will be built from random sampling of weights from the last generation & then mutated by variation
     # random sampling could pull individual weights, entire columns in the weight matrix or entire rows. which is best?
     def newGeneration(self, newPop = 20, variation = 0.1):
-         print "WE STILL NEED TO BUILD newGeneration!"
+        print "WE STILL NEED TO BUILD newGeneration!"
    
    
     # findFitness will loop through each nodeNets object and update the fitness given inputs and outputs
@@ -82,7 +89,7 @@ class geneticEvolution():
     
     # this function will sort the nodeNet object list (self.nodeNets) by fitness and remove all but the top Nsurvivors
     def selectBest(self, Nsurvivors = 5):
-         print "WE STILL NEED TO BUILD selectBest!"
+        print "WE STILL NEED TO BUILD selectBest!"
         
         
         
