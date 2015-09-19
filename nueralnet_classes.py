@@ -1,7 +1,6 @@
 # import modules
 import numpy as np
 import random as rand
-import copy as cp
 
 
 # define the class for each network
